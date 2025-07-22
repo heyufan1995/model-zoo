@@ -9,14 +9,22 @@ python -m monai.bundle download "vista3d" --bundle_dir "bundles/"
 ```
 Please refer to monai model zoo (https://github.com/Project-MONAI/model-zoo) for more details.
 # Inference:
-The bundle only provides single-gpu inference. User can modify within the inference [config](../configs/inference.json).
+The bundle only provides single-gpu inference. User can modify within the inference [config](../configs/inference.json). 
+
+## Label definition and segment everything
+We defined 345 classes as in [label_dict.json](../configs/label_dict.json). It shows the label organ name, index, training dataset, modality and evaluation dice score. If a class only comes from CT training dataset, it may not perform well on MRI, but the actual performance will vary case by case. We support three type of segment everything "CT_BODY", "MRI_BODY", and "MRI_BRAIN".  "CT_BODY" is the previous VISTA3D bundle supported 132 CT classes. "MRI_BODY" shares the same 50 label class as TotalsegmentatorMR. "MRI_BRAIN" is trained on skull stripped LUMIR dataset and will segment brain MRI substructures. The exact mapping for those three everything labels can be found in [metadata.json](../configs/metadata.json)
+
 ## Single image inference to segment everything (automatic)
-The output will be saved to `output_dir/spleen_03/spleen_03_{output_postfix}{output_ext}`.
+The output will be saved to `output_dir/spleen_03/spleen_03_{output_postfix}{output_ext}`. By default the everything will be "CT_BODY".
 ```
 python -m monai.bundle run --config_file configs/inference.json --input_dict "{'image':'spleen_03.nii.gz'}
 ```
+Add "MRI_BODY" to segment the MRI body classes.
+```
+python -m monai.bundle run --config_file configs/inference.json --input_dict "{'image':'spleen_03.nii.gz'} --modality MRI_BODY
+```
 ## Single image inference to segment specific class (automatic)
-The detailed automatic segmentation class index can be found [here](../configs/metadata.json).
+The detailed automatic segmentation class index can be found [here](../configs/label_dict.json).
 ```
 python -m monai.bundle run --config_file configs/inference.json --input_dict "{'image':'spleen_03.nii.gz','label_prompt':[3]}
 ```
@@ -25,6 +33,11 @@ python -m monai.bundle run --config_file configs/inference.json --input_dict "{'
 ```
 python -m monai.bundle run --config_file="['configs/inference.json', 'configs/batch_inference.json']" --input_dir="/data/Task09_Spleen/imagesTr" --output_dir="./eval_task09"
 ```
+Add "MRI_BODY" to segment the MRI body classes.
+```
+python -m monai.bundle run --config_file="['configs/inference.json', 'configs/batch_inference.json']" --modality MRI_BODY --input_dir="/data/Task09_Spleen/imagesTr" --output_dir="./eval_task09"
+```
+
 `configs/batch_inference.json` by default runs the segment everything workflow (classes defined by `everything_labels`) on all (`*.nii.gz`) files in `input_dir`.
 This default is overridable by changing the input folder `input_dir`, or the input image name suffix `input_suffix`, or directly setting the list of filenames `input_list`.
 
@@ -185,3 +198,5 @@ You may obtain a copy of the License at
 The model weights included in this project are licensed under the NCLS v1 License.
 
 Both licenses' full texts have been combined into a single `LICENSE` file. Please refer to this `LICENSE` file for more details about the terms and conditions of both licenses.
+
+For MRI CT joint model. The license is non-commercial and needs furture discussion. 
