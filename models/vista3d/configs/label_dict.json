@@ -7,7 +7,6 @@
         ],
         "CT": [
             "AMOS22",
-            "ATLAS",
             "Abdomen8k",
             "AbdomenCT-1K",
             "AutoPETAtlas",
@@ -22,6 +21,7 @@
         ],
         "MRI": [
             "AMOS22MR",
+            "ATLAS",
             "TotalSegmentatorMR"
         ],
         "dice_score": 0.9547
@@ -426,10 +426,12 @@
             "CT"
         ],
         "CT": [
-            "ATLAS",
             "CRLM-CT",
             "Task03",
             "Task08"
+        ],
+        "MRI": [
+            "ATLAS"
         ],
         "dice_score": 0.6758
     },
